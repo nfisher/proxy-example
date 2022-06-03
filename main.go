@@ -19,7 +19,7 @@ func main() {
 			log.Println(err.Error())
 			os.Exit(1)
 		}
-		log.Printf("ips=%v\n", ips)
+		log.Printf("no_proxy=%v ips=%v\n", noProxyForOldMen, ips)
 		if len(ips) == 1 {
 			os.Setenv("NO_PROXY", ips[0].String())
 		}
