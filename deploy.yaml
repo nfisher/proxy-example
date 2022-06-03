@@ -1,0 +1,63 @@
+---
+#
+# Service Account
+#
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: proxy-example
+  namespace: default
+
+---
+#
+# Role
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: proxy-example
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+---
+#
+# Role Binding
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: proxy-example
+roleRef:
+  kind: ClusterRole
+  name: proxy-example
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: proxy-example
+  namespace: default
+
+---
+#
+# Pod
+#
+apiVersion: v1
+kind: Pod
+metadata:
+  name: proxy-example
+  namespace: default
+spec:
+  serviceAccountName: proxy-example
+  containers:
+  - name: proxy-example
+    image: nfinstana/proxy-example
+    env:
+    - name: HTTPS_PROXY
+      value: http://nfinstana.com:8000 # doesn't really matter
+    - name: NO_PROXY
+      value: "kubernetes.default.svc" # only works when the IP is referenced... :/
+    resources:
+      limits:
+        cpu: "0.25"
+        memory: "64Mi"
